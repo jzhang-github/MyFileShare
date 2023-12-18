@@ -10,11 +10,12 @@ import json
 from ase.io import read
 from ase import units
 from ase.calculators.calculator import Calculator
-# from ase.calculators.calculator import all_changes
 
 import torch
 from agat.data.build_dataset import CrystalGraph
 from agat.lib.model_lib import load_model
+
+os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
 
 class AgatCalculator(Calculator):
     implemented_properties = ['energy', 'forces', 'stress']
@@ -39,14 +40,6 @@ class AgatCalculator(Calculator):
         self.cg = CrystalGraph(**self.graph_build_scheme)
 
     def load_graph_build_scheme(self, path):
-        """ Load graph building scheme. This file is normally saved when you build your dataset.
-
-        :param path: Directory for storing ``graph_build_scheme.json`` file.
-        :type path: str
-        :return: A dict denotes how to build the graph.
-        :rtype: dict
-
-        """
         json_file  = os.path.join(path, 'graph_build_scheme.json')
         assert os.path.exists(json_file), f"{json_file} file dose not exist."
         with open(json_file, 'r') as jsonf:
@@ -54,18 +47,6 @@ class AgatCalculator(Calculator):
         return graph_build_scheme
 
     def calculate(self, atoms=None, properties=None, system_changes=['positions', 'numbers', 'cell', 'pbc']):
-        """
-
-        :param atoms: ase.atoms object, defaults to None
-        :type atoms: ase.atoms, optional
-        :param properties: calculated properties, defaults to None
-        :type properties: none, optional
-        :param system_changes: DESCRIPTION, defaults to ['positions', 'numbers', 'cell', 'pbc']
-        :type system_changes: TYPE, optional
-        :return: calculated results
-        :rtype: dict
-
-        """
 
         if atoms is not None:
             self.atoms = atoms.copy()
